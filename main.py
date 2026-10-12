@@ -66,6 +66,41 @@ def register():
         
     return render_template("register.html")
 
+# Login router
+@app.route('/login',methods=['POST','GET'])
+def login():
+
+    if request.method=='POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+        if not email or not password:
+            flash("Email and Password are required fields...!","warning")
+            return redirect(url_for('login'))
+
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute("SELECT * from users where email=%s",(email,))
+            user = cursor.fetchone()
+
+            if user:
+
+                validate_pw = bcrypt.checkpw(password.encode('utf-8'),user['password'].encode('utf-8'))
+                if validate_pw:
+                    return redirect(url_for('dashboard'))
+                else:
+                    flash('Invalid password...! Please try again...!')
+                    return redirect(url_for('login'))
+            else:
+                flash('Invalid user...! Please register...!')
+                return redirect(url_for('register'))
+        
+        except Error as err:
+            flash(f"Database Error:{err}",'error')
+            return redirect(url_for('login'))
+
+    return render_template('login.html')
 
 if __name__=="__main__":
     app.run(debug=True)
