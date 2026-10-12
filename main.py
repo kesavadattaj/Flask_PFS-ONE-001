@@ -1,5 +1,6 @@
 from flask import Flask,request,redirect,url_for,render_template,flash
 from mysql.connector import connect,Error
+import bcrypt
 
 app = Flask(__name__)
 app.config["SECRET_KEY"]="hhjsdwedfwerfwee#$#%$@E##!DAEDSSDFSD@#@%@#$R%@RW"
@@ -41,13 +42,19 @@ def register():
             cursor = conn.cursor(dictionary=True)
             cursor.execute("SELECT email from users where email=%s",(email,))
             db_email = cursor.fetchone()
+
+            # Check if email exists
             if db_email:
                 flash("Email already exist! Please use login...!",'warning')
                 cursor.close()
                 conn.close()
                 return redirect(url_for('register'))
             else:
-                cursor.execute("INSERT INTO users(name,email,password) VALUES (%s,%s,%s)",(name,email,password))
+                # Hash password with bcrypt
+                hashed_pw = bcrypt.hashpw(password.encode('utf-8'),bcrypt.gensalt())
+
+                # Insert user
+                cursor.execute("INSERT INTO users(name,email,password) VALUES (%s,%s,%s)",(name,email,hashed_pw))
                 conn.commit()
 
                 flash("User registration Successful...!",'success')
