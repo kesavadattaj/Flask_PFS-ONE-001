@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} SNM - Simple Notes Management {% endblock %}</title>
+    <link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <a href="home.html" class="logo">📝 SNM</a>
+        <div class="nav-links">
+            <!-- Links for logged out users -->
+            <a href="login.html">Login</a>
+            <a href="register.html">Register</a>
+            
+            <!-- Links for logged in users (uncomment when needed)
+            <a href="dashboard.html">Dashboard</a>
+            <a href="notes.html">My Notes</a>
+            <a href="files.html">My Files</a>
+            <a href="login.html">Logout</a>
+            -->
+        </div>
+    </nav>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for category,message in messages %}
+        <div class="flash {{category}}">{{message}}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+    
+    
+    <!-- Main Content Goes Here -->
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 SNM - Simple Notes Management. All rights reserved.</p>
+    </footer>
+</body>
+</html>
