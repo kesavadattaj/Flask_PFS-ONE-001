@@ -88,12 +88,13 @@ def login():
 
                 validate_pw = bcrypt.checkpw(password.encode('utf-8'),user['password'].encode('utf-8'))
                 if validate_pw:
+                    flash('Login Successful...!','success')
                     return redirect(url_for('dashboard'))
                 else:
-                    flash('Invalid password...! Please try again...!')
+                    flash('Invalid password...! Please try again...!','warning')
                     return redirect(url_for('login'))
             else:
-                flash('Invalid user...! Please register...!')
+                flash('Invalid user...! Please register...!','warning')
                 return redirect(url_for('register'))
         
         except Error as err:
@@ -101,6 +102,10 @@ def login():
             return redirect(url_for('login'))
 
     return render_template('login.html')
+
+@app.route('/dashboard')
+def dashboard():
+    return "Welcome to Dashbord...!"
 
 if __name__=="__main__":
     app.run(debug=True)
