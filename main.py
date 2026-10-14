@@ -124,9 +124,21 @@ def login():
 
     return render_template('login.html')
 
+@app.route('/logout')
+def logout():
+    if 'user_id' in session:
+        session.pop('user_id',None)
+        session.pop('user_name',None)
+        session.pop('email',None)
+        flash('logout successful...!','success')
+        return redirect(url_for('login'))
+    else:
+        return redirect(url_for('home'))
+
 @app.route('/dashboard')
 def dashboard():
     return render_template('dashboard.html')
+
 
 if __name__=="__main__":
     app.run(debug=True)
