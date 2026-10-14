@@ -2,6 +2,8 @@ from flask import Flask,request,redirect,url_for,render_template,flash,session
 from mysql.connector import connect,Error
 import bcrypt
 from datetime import datetime,timedelta
+from email.message import EmailMessage
+import smtplib
 
 app = Flask(__name__)
 app.config["SECRET_KEY"]="hhjsdwedfwerfwee#$#%$@E##!DAEDSSDFSD@#@%@#$R%@RW"
@@ -15,11 +17,40 @@ DB_CONFIG = {
     "database":"snm_db"
 }
 
+EMAIL_CONFIG = {
+    'smtp_server' : 'smtp.gmail.com',
+    'smtp_port' : 587,
+    'email' : 'kesavadatta@codegnan.com',
+    'password' : 'your_app_password'
+}
+
 # We'll define Helper methods
 def get_db_connection():
     # In this we'll create and get the db connection
     return connect(**DB_CONFIG)
 
+
+def send_email(to_email,subject,body,html=False):
+    try:
+        msg = EmailMessage()
+        msg['subject'] = subject
+        msg['From'] = EMAIL_CONFIG['email']
+        msg['To'] = to_email
+
+        if html:
+            msg.add_alternative(body,subtype='html')
+        else:
+            msg.set_content(body)
+
+        with smtplib.SMTP(EMAIL_CONFIG['smtp_server'],EMAIL_CONFIG['smtp_port']) as server:
+            server.starttls()
+            server.login(EMAIL_CONFIG['email'],EMAIL_CONFIG['password'])
+            server.send_message(msg)
+
+        return True
+    except Exception as e:
+        print(f"Email error:{e}")
+        return False
 
 @app.route('/')
 def home():
