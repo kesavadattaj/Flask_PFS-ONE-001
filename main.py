@@ -1,9 +1,11 @@
-from flask import Flask,request,redirect,url_for,render_template,flash
+from flask import Flask,request,redirect,url_for,render_template,flash,session
 from mysql.connector import connect,Error
 import bcrypt
+from datetime import datetime,timedelta
 
 app = Flask(__name__)
 app.config["SECRET_KEY"]="hhjsdwedfwerfwee#$#%$@E##!DAEDSSDFSD@#@%@#$R%@RW"
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=1)
 
 DB_CONFIG = {
     "host":"127.0.0.1", # localhost ip = 127.0.0.1
@@ -18,9 +20,20 @@ def get_db_connection():
     # In this we'll create and get the db connection
     return connect(**DB_CONFIG)
 
+
+@app.route('/')
+def home():
+    if 'user_id' in session:
+        return redirect(url_for('dashboard'))
+    
+    return render_template('home.html')
+
 # Let's define register router
 @app.route('/register',methods=['POST','GET'])
 def register():
+
+    if 'user_id' in session:
+        return redirect(url_for('dashboard'))
 
     if request.method=='POST':
         name = request.form.get('name')
@@ -69,6 +82,8 @@ def register():
 # Login router
 @app.route('/login',methods=['POST','GET'])
 def login():
+    if 'user_id' in session:
+        return redirect(url_for('dashboard'))
 
     if request.method=='POST':
         email = request.form.get('email')
@@ -87,7 +102,13 @@ def login():
             if user:
 
                 validate_pw = bcrypt.checkpw(password.encode('utf-8'),user['password'].encode('utf-8'))
+        
                 if validate_pw:
+                    session.permanent = True
+                    session['user_id'] = user['id']
+                    session['user_name'] = user['name']
+                    session['email'] = user['email']
+
                     flash('Login Successful...!','success')
                     return redirect(url_for('dashboard'))
                 else:
