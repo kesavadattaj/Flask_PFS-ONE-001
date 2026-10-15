@@ -25,7 +25,7 @@ EMAIL_CONFIG = {
     'smtp_server' : 'smtp.gmail.com',
     'smtp_port' : 587,
     'email' : 'kesavadatta@codegnan.com',
-    'password' : 'your_app_password'
+    'password' : 'lmkn twaa szrr ypka'
 }
 
 # We'll define Helper methods
@@ -285,6 +285,8 @@ def reset_password(token):
 
 @app.route('/dashboard')
 def dashboard():
+    if not 'user_id' in session:
+        return redirect(url_for('login'))
     return render_template('dashboard.html')
 
 
