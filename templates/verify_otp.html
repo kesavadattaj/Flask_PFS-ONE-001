@@ -1,23 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verify OTP - SNM</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <a href="home.html" class="logo">📝 SNM</a>
-        <div class="nav-links">
-            <a href="login.html">Login</a>
-            <a href="register.html">Register</a>
-        </div>
-    </nav>
-    
-    <!-- Main Content -->
-    <main>
+{% extends 'base.html' %}
+
+{% block title %} Verify OTP - SNM {% endblock %}
+
+
+{% block content %}
+
         <div class="container">
             <div class="card">
                 <h2>✉️ Verify Your Email</h2>
@@ -34,11 +21,4 @@
                 </p>
             </div>
         </div>
-    </main>
-    
-    <!-- Footer -->
-    <footer class="footer">
-        <p>&copy; 2024 SNM - Simple Notes Management. All rights reserved.</p>
-    </footer>
-</body>
-</html>
+{% endblock %}
