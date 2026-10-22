@@ -5,27 +5,30 @@ from datetime import datetime,timedelta
 from email.message import EmailMessage
 import smtplib
 from itsdangerous import URLSafeTimedSerializer
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 app = Flask(__name__)
-app.config["SECRET_KEY"]="hhjsdwedfwerfwee#$#%$@E##!DAEDSSDFSD@#@%@#$R%@RW"
+app.config["SECRET_KEY"]=os.getenv("SECRET_KEY")
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=1)
 
 serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
-salt = 'F#$WE#RFCERF#%$^#%RGWERTGERF'
+salt = os.getenv('SALT_KEY')
 
 DB_CONFIG = {
-    "host":"127.0.0.1", # localhost ip = 127.0.0.1
-    "port":3306,
-    "user":"root",
-    "password":"0818",
-    "database":"snm_db"
+    "host":os.getenv("DB_HOST"), # localhost ip = 127.0.0.1
+    "port":os.getenv("DB_PORT"),
+    "user":os.getenv("DB_USER"),
+    "password":os.getenv("DB_PASSWORD"),
+    "database":os.getenv("DB_NAME")
 }
 
 EMAIL_CONFIG = {
     'smtp_server' : 'smtp.gmail.com',
     'smtp_port' : 587,
-    'email' : 'kesavadatta@codegnan.com',
-    'password' : 'lmkn twaa szrr ypka'
+    'email' : os.getenv("SMTP_EMAIL"),
+    'password' : os.getenv("SMTP_PASSWORD")
 }
 
 # We'll define Helper methods
