@@ -147,8 +147,8 @@ def register():
 
                 cursor.close()
                 conn.close()
-                flash("User registration Successful...!",'success')
-                return render_template('login.html')
+                flash("User registration Successful...! Please Verify your email...!",'success')
+                return redirect(url_for('verify_otp'))
 
         except Error as err:
             flash(f"Database Error:{err}",'error')
