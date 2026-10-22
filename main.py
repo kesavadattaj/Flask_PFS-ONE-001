@@ -7,6 +7,7 @@ import smtplib
 from itsdangerous import URLSafeTimedSerializer
 from dotenv import load_dotenv
 import os
+import random
 load_dotenv()
 
 app = Flask(__name__)
@@ -36,6 +37,11 @@ def get_db_connection():
     # In this we'll create and get the db connection
     return connect(**DB_CONFIG)
 
+
+#Otp helper method
+def generate_otp():
+    # generate 6 digit otp
+    return str(random.randint(100000,999999))
 
 def send_email(to_email,subject,body,html=False):
     try:
@@ -119,9 +125,25 @@ def register():
                 # Hash password with bcrypt
                 hashed_pw = bcrypt.hashpw(password.encode('utf-8'),bcrypt.gensalt())
 
+                otp = generate_otp()
+
+                
                 # Insert user
-                cursor.execute("INSERT INTO users(name,email,password) VALUES (%s,%s,%s)",(name,email,hashed_pw))
+                cursor.execute("INSERT INTO users(name,email,password,otp) VALUES (%s,%s,%s,%s)",(name,email,hashed_pw,otp))
                 conn.commit()
+
+                session['pending_email'] = email
+
+                # Send OTP Email
+                email_body = f"""
+                <h2>Welcome to SNM!</h2>
+                <p>Your OTP for account verification is:</p>
+                <h1 style="color: #667eea;">{otp}</h1>
+                <p>This OTP will expire in 10 minutes.</p>
+                """
+                subject = 'SNM - Verify your Email'
+                send_email(to_email=email,subject=subject,body=email_body,html=True)
+
 
                 cursor.close()
                 conn.close()
@@ -133,6 +155,68 @@ def register():
             return redirect(url_for('register'))
         
     return render_template("register.html")
+
+@app.route('/verify-otp',methods = ['GET','POST'])
+def verify_otp():
+    if 'pending_email' not in session:
+        return redirect(url_for('register'))
+
+    if request.method=='POST':
+        otp = request.form.get('otp')
+        email = session.get('pending_email')
+
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute("SELECT email from users where email=%s and otp=%s",(email,otp))
+            user = cursor.fetchone()
+            if user:
+                cursor.execute("UPDATE USERS SET is_active = 1, otp=NULL where email=%s",(email,))
+                session.pop('pending_email')
+                conn.commit()
+                cursor.close()
+                conn.close()
+                flash("Email Verified...! Please Login...!",'success')
+                return redirect(url_for('login'))
+            else:
+                flash('Incorrect otp, Please try again...!','error')
+                return redirect(url_for('verify_otp'))
+            cursor.close()
+            conn.close()
+        except Error as err:
+            flash(f"Database Error:{err}",'error')
+            return redirect(url_for('verify_otp'))
+    return render_template('verify_otp.html')
+
+@app.route('/resend-otp')
+def resend_otp():
+    email = session.get('pending_email')
+    if not email:
+        return redirect(url_for('register'))
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        otp = generate_otp()
+        cursor.execute("UPDATE USERS SET otp=%s where email=%s",(otp,email))
+        conn.commit()
+
+        email_body = f"""
+        <h2>SNM - New OTP</h2>
+        <p>Your new OTP is:</p>
+        <h1 style="color: #667eea;">{otp}</h1>
+        """
+        send_email(to_email=email, subject='SNM - New OTP', body=email_body, html=True)
+
+        cursor.close()
+        conn.close()
+        flash("New Otp is sent to email...!")
+        return redirect(url_for('verify_otp'))
+    except Error as err:
+        flash(f"Database Error:{err}",'error')
+        return redirect(url_for('verify_otp'))
+    
 
 # Login router
 @app.route('/login',methods=['POST','GET'])
@@ -158,6 +242,10 @@ def login():
             conn.close()
 
             if user:
+                if not user['is_active']:
+                    session['pending_email'] = email
+                    flash("Please verify your email...!",'warning')
+                    return redirect(url_for('verify_otp'))
 
                 validate_pw = bcrypt.checkpw(password.encode('utf-8'),user['password'].encode('utf-8'))
         
