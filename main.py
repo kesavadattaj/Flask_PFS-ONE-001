@@ -555,7 +555,7 @@ def add_note():
             cursor.close()
             conn.close()
 
-            flash("Note Created successfully...!")
+            flash("Note Created successfully...!",'success')
 
             return redirect(url_for('notes'))
 
