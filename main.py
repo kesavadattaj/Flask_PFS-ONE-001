@@ -97,7 +97,7 @@ def check_tables_exist():
                 description TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                FOREI GNKEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
             )
         ''')
         print("✓ Table 'notes' is ready.")
@@ -535,7 +535,37 @@ def dashboard():
         return redirect(url_for('login'))
     return render_template('dashboard.html')
 
+@app.route('/notes/add',methods=['GET','POST'])
+def add_note():
+    if request.method=='POST':
+        title = request.form.get('title')
+        description = request.form.get('description')
 
+        if not title and not description:
+            flash("Title and description fields are required...!",'warning')
+            return redirect(url_for('add_note'))
+
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor(dictionary=True)
+
+            cursor.execute('INSERT INTO notes (user_id,title,description) VALUES (%s,%s,%s)',(session.get('user_id'),title,description))
+
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            flash("Note Created successfully...!")
+
+            return redirect(url_for('notes'))
+
+
+        except Error as err:
+            flash(f"Database Error:{err}",'error')
+            return redirect(url_for('add_note'))
+
+
+    return render_template('add_note.html')
 
 
 if __name__ == '__main__':
