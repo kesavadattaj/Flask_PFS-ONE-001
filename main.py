@@ -535,6 +535,28 @@ def dashboard():
         return redirect(url_for('login'))
     return render_template('dashboard.html')
 
+@app.route('/notes')
+def notes():
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("SELECT n.*,(SELECT count(*) from files f where f.note_id = n.id)  as files_count from notes n where user_id=%s ORDER BY n.created_at DESC",(session.get('user_id'),))
+
+        notes = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return render_template('notes.html',notes=notes)
+
+
+    except Error as err:
+        flash(f"Database Error:{err}",'error')
+        return render_template('notes.html',notes=[])
+    
+
 @app.route('/notes/add',methods=['GET','POST'])
 def add_note():
     if request.method=='POST':
