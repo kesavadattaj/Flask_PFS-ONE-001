@@ -8,6 +8,7 @@ from itsdangerous import URLSafeTimedSerializer
 from dotenv import load_dotenv
 import os
 import random
+from functools import wraps
 load_dotenv()
 
 app = Flask(__name__)
@@ -182,7 +183,7 @@ def db_connection_required(f):
     def decorated_function(*args, **kwargs):
         try:
             return f(*args, **kwargs)
-        except mysql.connector.Error as err:
+        except Error as err:
             if err.errno == 1049:  # Unknown database
                 flash('Database not found. Please restart the application.', 'error')
             elif err.errno == 1146:  # Table doesn't exist
