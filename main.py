@@ -540,5 +540,15 @@ def dashboard():
 
 
 
-if __name__=="__main__":
-    app.run(debug=True)
+if __name__ == '__main__':
+    # Initialize database before starting the app
+    if init_database():
+        print("Starting Flask application...")
+        print("Access the app at: http://127.0.0.1:5000")
+        print("-"*50)
+        app.run(debug=True, port=5000)
+    else:
+        print("\n" + "!"*50)
+        print("Application could not start due to database errors.")
+        print("Please fix the issues above and try again.")
+        print("!"*50)
