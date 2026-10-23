@@ -1,25 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search - SNM</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <!-- Navigation (Logged In) -->
-    <nav class="navbar">
-        <a href="home.html" class="logo">📝 SNM</a>
-        <div class="nav-links">
-            <a href="dashboard.html">Dashboard</a>
-            <a href="notes.html">My Notes</a>
-            <a href="files.html">My Files</a>
-            <a href="login.html">Logout</a>
-        </div>
-    </nav>
-    
-    <!-- Main Content -->
-    <main>
+{% extends 'base.html' %}
+
+{% block title %}Search - SNM {% endblock %}
+
+{% block content %}
         <div class="container">
             <div class="search-container">
                 <h2>🔍 Search Notes</h2>
@@ -41,11 +24,4 @@
                 </div>
             </div>
         </div>
-    </main>
-    
-    <!-- Footer -->
-    <footer class="footer">
-        <p>&copy; 2024 SNM - Simple Notes Management. All rights reserved.</p>
-    </footer>
-</body>
-</html>
+{% endblock %}

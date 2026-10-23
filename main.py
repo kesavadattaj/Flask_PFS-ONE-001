@@ -528,8 +528,6 @@ def reset_password(token):
         
     return render_template('reset_password.html',token=token)
 
-        
-
 
 @app.route('/dashboard')
 def dashboard():
