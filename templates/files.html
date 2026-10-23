@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Files - SNM</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation (Logged In) -->
+    <nav class="navbar">
+        <a href="home.html" class="logo">📝 SNM</a>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="notes.html">My Notes</a>
+            <a href="files.html">My Files</a>
+            <a href="login.html">Logout</a>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <div class="files-container">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                    <h2>📁 My Files</h2>
+                    <a href="upload_file.html" class="btn btn-primary" style="width: auto;">📤 Upload File</a>
+                </div>
+                
+                <div class="files-grid">
+                    <div class="file-card">
+                        <div class="file-icon">📄</div>
+                        <h4>document.pdf</h4>
+                        <p style="color: #667eea; font-size: 12px; margin: 5px 0;">
+                            📎 Linked to: <a href="view_note.html">My First Note</a>
+                        </p>
+                        <small style="color: #999;">Uploaded: 2024-01-15</small>
+                        <div class="file-actions">
+                            <a href="#" class="btn btn-secondary" style="padding: 8px 12px; font-size: 14px;">View</a>
+                            <a href="#" class="btn btn-primary" style="padding: 8px 12px; font-size: 14px;">Download</a>
+                            <a href="files.html" class="btn btn-danger" style="padding: 8px 12px; font-size: 14px;" onclick="return confirm('Are you sure?')">Delete</a>
+                        </div>
+                    </div>
+                    <div class="file-card">
+                        <div class="file-icon">🖼️</div>
+                        <h4>image.png</h4>
+                        <p style="color: #999; font-size: 12px; margin: 5px 0;">Not linked to any note</p>
+                        <small style="color: #999;">Uploaded: 2024-01-14</small>
+                        <div class="file-actions">
+                            <a href="#" class="btn btn-secondary" style="padding: 8px 12px; font-size: 14px;">View</a>
+                            <a href="#" class="btn btn-primary" style="padding: 8px 12px; font-size: 14px;">Download</a>
+                            <a href="files.html" class="btn btn-danger" style="padding: 8px 12px; font-size: 14px;" onclick="return confirm('Are you sure?')">Delete</a>
+                        </div>
+                    </div>
+                    <div class="file-card">
+                        <div class="file-icon">📝</div>
+                        <h4>notes.txt</h4>
+                        <p style="color: #667eea; font-size: 12px; margin: 5px 0;">
+                            📎 Linked to: <a href="view_note.html">My First Note</a>
+                        </p>
+                        <small style="color: #999;">Uploaded: 2024-01-13</small>
+                        <div class="file-actions">
+                            <a href="#" class="btn btn-secondary" style="padding: 8px 12px; font-size: 14px;">View</a>
+                            <a href="#" class="btn btn-primary" style="padding: 8px 12px; font-size: 14px;">Download</a>
+                            <a href="files.html" class="btn btn-danger" style="padding: 8px 12px; font-size: 14px;" onclick="return confirm('Are you sure?')">Delete</a>
+                        </div>
+                    </div>
+                    <div class="file-card">
+                        <div class="file-icon">📋</div>
+                        <h4>report.docx</h4>
+                        <p style="color: #667eea; font-size: 12px; margin: 5px 0;">
+                            📎 Linked to: <a href="view_note.html">Meeting Notes</a>
+                        </p>
+                        <small style="color: #999;">Uploaded: 2024-01-12</small>
+                        <div class="file-actions">
+                            <a href="#" class="btn btn-secondary" style="padding: 8px 12px; font-size: 14px;">View</a>
+                            <a href="#" class="btn btn-primary" style="padding: 8px 12px; font-size: 14px;">Download</a>
+                            <a href="files.html" class="btn btn-danger" style="padding: 8px 12px; font-size: 14px;" onclick="return confirm('Are you sure?')">Delete</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 SNM - Simple Notes Management. All rights reserved.</p>
+    </footer>
+</body>
+</html>

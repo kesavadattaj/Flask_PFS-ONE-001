@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search - SNM</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation (Logged In) -->
+    <nav class="navbar">
+        <a href="home.html" class="logo">📝 SNM</a>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="notes.html">My Notes</a>
+            <a href="files.html">My Files</a>
+            <a href="login.html">Logout</a>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <div class="search-container">
+                <h2>🔍 Search Notes</h2>
+                <form method="POST" action="search.html" class="search-form">
+                    <input type="text" name="query" placeholder="Search notes by title or content..." required>
+                    <button type="submit" class="btn btn-primary" style="width: auto;">Search</button>
+                </form>
+            </div>
+            
+            <!-- Search Results -->
+            <div class="notes-container">
+                <h2>Search Results for "meeting"</h2>
+                <div class="notes-grid">
+                    <div class="note-card">
+                        <h4>Meeting Notes</h4>
+                        <p>Important points from the team meeting about the project...</p>
+                        <a href="view_note.html">View Note</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 SNM - Simple Notes Management. All rights reserved.</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Note - SNM</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation (Logged In) -->
+    <nav class="navbar">
+        <a href="home.html" class="logo">📝 SNM</a>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="notes.html">My Notes</a>
+            <a href="files.html">My Files</a>
+            <a href="login.html">Logout</a>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <div class="card" style="max-width: 800px;">
+                <h2>My First Note</h2>
+                <div style="margin-bottom: 20px; color: #666;">
+                    <small>Created: 2024-01-15 | Last Updated: 2024-01-15</small>
+                </div>
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <p style="white-space: pre-wrap; line-height: 1.8;">This is the full content of the note. It can contain multiple lines and paragraphs.
+
+Here is another paragraph with more details about the note content.
+
+You can write as much as you want here!</p>
+                </div>
+                
+                <!-- Attached Files Section -->
+                <div style="margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 15px;">📎 Attached Files</h3>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                        <div style="background: #e9ecef; padding: 10px 15px; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
+                            <span>📄 document.pdf</span>
+                            <a href="files.html" style="color: #667eea;">View</a>
+                            <a href="#" style="color: #28a745;">Download</a>
+                        </div>
+                        <div style="background: #e9ecef; padding: 10px 15px; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
+                            <span>📄 notes.txt</span>
+                            <a href="files.html" style="color: #667eea;">View</a>
+                            <a href="#" style="color: #28a745;">Download</a>
+                        </div>
+                    </div>
+                    <a href="upload_file.html" class="btn btn-secondary" style="margin-top: 15px; width: auto; padding: 8px 16px;">+ Attach File</a>
+                </div>
+                
+                <div style="display: flex; gap: 15px;">
+                    <a href="edit_note.html" class="btn btn-primary" style="width: auto;">Edit Note</a>
+                    <a href="notes.html" class="btn btn-danger" style="width: auto;" onclick="return confirm('Are you sure?')">Delete Note</a>
+                    <a href="notes.html" class="btn btn-secondary" style="width: auto;">← Back to Notes</a>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 SNM - Simple Notes Management. All rights reserved.</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload File - SNM</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation (Logged In) -->
+    <nav class="navbar">
+        <a href="home.html" class="logo">📝 SNM</a>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="notes.html">My Notes</a>
+            <a href="files.html">My Files</a>
+            <a href="login.html">Logout</a>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <div class="card" style="max-width: 500px;">
+                <h2>📤 Upload File</h2>
+                <form method="POST" action="files.html" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="file">Select File</label>
+                        <input type="file" id="file" name="file" required style="padding: 10px;">
+                        <small style="color: #666; display: block; margin-top: 5px;">
+                            Allowed: PDF, TXT, DOC, DOCX, PNG, JPG, JPEG (Max: 5MB)
+                        </small>
+                    </div>
+                    <div class="form-group">
+                        <label for="note_id">Link to Note (Optional)</label>
+                        <select id="note_id" name="note_id">
+                            <option value="">-- Select Note to Link --</option>
+                            <option value="1">My First Note</option>
+                            <option value="2">Meeting Notes</option>
+                            <option value="3">Shopping List</option>
+                        </select>
+                        <small style="color: #666; display: block; margin-top: 5px;">
+                            Attach this file to an existing note
+                        </small>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Upload File</button>
+                </form>
+                <p class="text-center">
+                    <a href="files.html">← Back to Files</a>
+                </p>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 SNM - Simple Notes Management. All rights reserved.</p>
+    </footer>
+</body>
+</html>
