@@ -13,6 +13,9 @@ load_dotenv()
 app = Flask(__name__)
 app.config["SECRET_KEY"]=os.getenv("SECRET_KEY")
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=1)
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB max file size
+app.config['ALLOWED_EXTENSIONS'] = {'pdf', 'txt', 'doc', 'docx', 'png', 'jpg', 'jpeg'}
 
 serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 salt = os.getenv('SALT_KEY')
@@ -32,11 +35,164 @@ EMAIL_CONFIG = {
     'password' : os.getenv("SMTP_PASSWORD")
 }
 
-# We'll define Helper methods
-def get_db_connection():
-    # In this we'll create and get the db connection
-    return connect(**DB_CONFIG)
 
+# ==================== DATABASE INITIALIZATION ====================
+
+def check_database_exists():
+    """Check if database exists, create if not"""
+    try:
+        conn = connect(
+            host=DB_CONFIG['host'],
+            user=DB_CONFIG['user'],
+            password=DB_CONFIG['password']
+        )
+        cursor = conn.cursor()
+        
+        # Create database if not exists
+        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {DB_CONFIG['database']}")
+        print(f"✓ Database '{DB_CONFIG['database']}' is ready.")
+        
+        cursor.close()
+        conn.close()
+        return True
+        
+    except Error as err:
+        if err.errno == 1045:  # Access denied
+            print(f"✗ Database Error: Access denied. Check username/password in DB_CONFIG.")
+        elif err.errno == 2003:  # Can't connect
+            print(f"✗ Database Error: Cannot connect to MySQL server. Is MySQL running?")
+        else:
+            print(f"✗ Database Error: {err}")
+        return False
+
+
+def check_tables_exist():
+    """Check if tables exist, create if not"""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Create users table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                email VARCHAR(120) UNIQUE NOT NULL,
+                password VARCHAR(256) NOT NULL,
+                otp VARCHAR(6) DEFAULT NULL,
+                is_active TINYINT(1) DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            )
+        ''')
+        print("✓ Table 'users' is ready.")
+        
+        # Create notes table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS notes (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                title VARCHAR(200) NOT NULL,
+                description TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                FOREI GNKEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            )
+        ''')
+        print("✓ Table 'notes' is ready.")
+        
+        # Create files table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS files (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                note_id INT DEFAULT NULL,
+                filename VARCHAR(255) NOT NULL,
+                filepath VARCHAR(500) NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                FOREIGN KEY (note_id) REFERENCES notes(id) ON DELETE SET NULL
+            )
+        ''')
+        print("✓ Table 'files' is ready.")
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return True
+        
+    except Error as err:
+        print(f"✗ Table Creation Error: {err}")
+        return False
+
+
+def init_database():
+    """Initialize database and create tables with proper error handling"""
+    print("\n" + "="*50)
+    print("SNM - Database Initialization")
+    print("="*50)
+    
+    # Step 1: Check/Create Database
+    print("\n[1/3] Checking database...")
+    if not check_database_exists():
+        print("\n⚠ Database initialization failed!")
+        print("Please ensure MySQL is running and credentials are correct.")
+        return False
+    
+    # Step 2: Check/Create Tables
+    print("\n[2/3] Checking tables...")
+    if not check_tables_exist():
+        print("\n⚠ Table initialization failed!")
+        return False
+    
+    # Step 3: Create upload folder
+    print("\n[3/3] Checking upload folder...")
+    try:
+        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+        print(f"✓ Upload folder '{app.config['UPLOAD_FOLDER']}' is ready.")
+    except OSError as err:
+        print(f"✗ Upload Folder Error: {err}")
+        return False
+    
+    print("\n" + "="*50)
+    print("✓ Database initialization completed successfully!")
+    print("="*50 + "\n")
+    return True
+
+
+def get_db_connection():
+    """Create and return database connection with error handling"""
+    try:
+        conn = connect(**DB_CONFIG)
+        return conn
+    except Error as err:
+        if err.errno == 1049:  # Unknown database
+            print(f"Database '{DB_CONFIG['database']}' does not exist. Creating...")
+            if check_database_exists() and check_tables_exist():
+                return connect(**DB_CONFIG)
+        raise err
+
+
+# ==================== DATABASE CONNECTION DECORATOR ====================
+
+def db_connection_required(f):
+    """Decorator to handle database connection errors gracefully"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except mysql.connector.Error as err:
+            if err.errno == 1049:  # Unknown database
+                flash('Database not found. Please restart the application.', 'error')
+            elif err.errno == 1146:  # Table doesn't exist
+                flash('Database tables not found. Please restart the application.', 'error')
+            elif err.errno == 2003:  # Can't connect
+                flash('Cannot connect to database. Please check if MySQL is running.', 'error')
+            else:
+                flash(f'Database error: {err}', 'error')
+            return redirect(url_for('home'))
+    return decorated_function
 
 #Otp helper method
 def generate_otp():
@@ -379,6 +535,8 @@ def dashboard():
     if not 'user_id' in session:
         return redirect(url_for('login'))
     return render_template('dashboard.html')
+
+
 
 
 if __name__=="__main__":
