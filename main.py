@@ -631,7 +631,51 @@ def view_note(note_id):
         flash(f"Database Error:{err}",'error')
         return redirect(url_for('notes'))
     
-   
+
+@app.route('/edit-note/<int:note_id>',methods=['GET','POST'])
+@login_required
+def edit_note(note_id):
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("SELECT * from notes where id=%s and user_id=%s",(note_id,session.get('user_id')))
+        
+        note = cursor.fetchone()
+
+        if not note:
+            flash('Note not found or access denied...!','error')
+            cursor.close()
+            conn.close()
+            return redirect(url_for('notes'))
+
+        
+        if request.method=='POST':
+            title = request.form.get('title')
+            description = request.form.get('description')
+    
+            if not title and not description:
+                flash("Title and description fields are required...!",'warning')
+                return redirect(url_for('edit_note',note_id=note_id))
+           
+            cursor.execute('UPDATE notes set title=%s,description=%s where id=%s and user_id=%s',(title,description,note_id,session.get('user_id')))
+            conn.commit()
+            cursor.close()
+            conn.close()
+            flash("Note updated successfully...!",'success')
+            return redirect(url_for('view_note',note_id=note_id))
+
+        cursor.close()
+        conn.close()
+        return render_template('edit_note.html',note=note)
+        
+
+    except Error as err:
+        flash(f"Database Error:{err}",'error')
+        return redirect(url_for('notes'))
+
+
 
 
 

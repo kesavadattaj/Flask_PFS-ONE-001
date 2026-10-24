@@ -2,22 +2,23 @@
 
 {% block title %} Edit Note - SNM {% endblock %}
 
+{% block content %}
         <div class="container">
             <div class="card" style="max-width: 600px;">
                 <h2>✏️ Edit Note</h2>
-                <form method="POST" action="view_note.html">
+                <form method="POST">
                     <div class="form-group">
                         <label for="title">Note Title</label>
-                        <input type="text" id="title" name="title" value="My First Note" required>
+                        <input type="text" id="title" name="title" value="{{note.title}}" required>
                     </div>
                     <div class="form-group">
                         <label for="description">Description</label>
-                        <textarea id="description" name="description" required>This is the existing content of the note that will be edited.</textarea>
+                        <textarea id="description" name="description" required>{{note.description}}</textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">Update Note</button>
                 </form>
                 <p class="text-center">
-                    <a href="view_note.html">← Back to Note</a>
+                    <a href="{{url_for('view_note',note_id=note.id)}}">← Back to Note</a>
                 </p>
             </div>
         </div>

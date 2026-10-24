@@ -33,7 +33,7 @@
                 </div>
                 
                 <div style="display: flex; gap: 15px;">
-                    <a href="edit_note.html" class="btn btn-primary" style="width: auto;">Edit Note</a>
+                    <a href="{{url_for('edit_note',note_id=note.id)}}" class="btn btn-primary" style="width: auto;">Edit Note</a>
 
                     <a href="notes.html" class="btn btn-danger" style="width: auto;" onclick="return confirm('Are you sure?')">Delete Note</a>
 
