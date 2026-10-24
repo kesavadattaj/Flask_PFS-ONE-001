@@ -602,7 +602,7 @@ def add_note():
 
     return render_template('add_note.html')
 
-@app.route('view-note/<int:note_id>')
+@app.route('/view-note/<int:note_id>')
 @login_required
 def view_note(note_id):
 

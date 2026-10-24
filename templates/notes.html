@@ -20,7 +20,7 @@
                         <p style="color: #667eea; font-size: 12px; margin: 5px 0;">📎 {{note.files_count}} file(s) attached</p>
                         <small style="color: #999;">Created: {{note.created_at}}</small>
                         <div class="note-actions">
-                            <a href="view_note.html" class="btn btn-secondary" style="padding: 8px 16px;">View</a>
+                            <a href="{{url_for('view_note',note_id=note.id)}}" class="btn btn-secondary" style="padding: 8px 16px;">View</a>
                             <a href="edit_note.html" class="btn btn-primary" style="padding: 8px 16px;">Edit</a>
                             <a href="notes.html" class="btn btn-danger" style="padding: 8px 16px;" onclick="return confirm('Are you sure?')">Delete</a>
                         </div>
