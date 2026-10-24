@@ -8,43 +8,31 @@
             <div class="notes-container">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
                     <h2>📋 My Notes</h2>
-                    <a href="add_note.html" class="btn btn-primary" style="width: auto;">+ Add New Note</a>
+                    <a href="{{url_for('add_note')}}" class="btn btn-primary" style="width: auto;">+ Add New Note</a>
                 </div>
                 
+                {% if notes %}
                 <div class="notes-grid">
+                    {% for note in notes %}
                     <div class="note-card">
-                        <h4>My First Note</h4>
-                        <p>This is a sample note description that shows how notes will appear on the page...</p>
-                        <p style="color: #667eea; font-size: 12px; margin: 5px 0;">📎 2 file(s) attached</p>
-                        <small style="color: #999;">Created: 2024-01-15</small>
+                        <h4>{{note.title}}</h4>
+                        <p>{{note.description}}</p>
+                        <p style="color: #667eea; font-size: 12px; margin: 5px 0;">📎 {{note.files_count}} file(s) attached</p>
+                        <small style="color: #999;">Created: {{note.created_at}}</small>
                         <div class="note-actions">
                             <a href="view_note.html" class="btn btn-secondary" style="padding: 8px 16px;">View</a>
                             <a href="edit_note.html" class="btn btn-primary" style="padding: 8px 16px;">Edit</a>
                             <a href="notes.html" class="btn btn-danger" style="padding: 8px 16px;" onclick="return confirm('Are you sure?')">Delete</a>
                         </div>
                     </div>
-                    <div class="note-card">
-                        <h4>Meeting Notes</h4>
-                        <p>Important points from the team meeting about the project...</p>
-                        <p style="color: #667eea; font-size: 12px; margin: 5px 0;">📎 1 file(s) attached</p>
-                        <small style="color: #999;">Created: 2024-01-14</small>
-                        <div class="note-actions">
-                            <a href="view_note.html" class="btn btn-secondary" style="padding: 8px 16px;">View</a>
-                            <a href="edit_note.html" class="btn btn-primary" style="padding: 8px 16px;">Edit</a>
-                            <a href="notes.html" class="btn btn-danger" style="padding: 8px 16px;" onclick="return confirm('Are you sure?')">Delete</a>
-                        </div>
-                    </div>
-                    <div class="note-card">
-                        <h4>Shopping List</h4>
-                        <p>Items to buy from the store this weekend...</p>
-                        <small style="color: #999;">Created: 2024-01-13</small>
-                        <div class="note-actions">
-                            <a href="view_note.html" class="btn btn-secondary" style="padding: 8px 16px;">View</a>
-                            <a href="edit_note.html" class="btn btn-primary" style="padding: 8px 16px;">Edit</a>
-                            <a href="notes.html" class="btn btn-danger" style="padding: 8px 16px;" onclick="return confirm('Are you sure?')">Delete</a>
-                        </div>
-                    </div>
+                    {% endfor %}
+                    
                 </div>
+                {% else %}
+                 <p style="text-align: center; color: #666; padding: 40px;">
+                No notes yet. <a href="{{ url_for('add_note') }}">Create your first note!</a>
+            </p>
+            {% endif %}
             </div>
         </div>
 {% endblock %}

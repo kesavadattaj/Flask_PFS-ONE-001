@@ -234,6 +234,17 @@ def verify_reset_token(token,expiration=600):
         return None
 
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args,**kwargs):
+        if not 'user_id' in session:
+            flash("Please login to access this page.",'warning')
+            return redirect(url_for('login'))
+        return f(*args,**kwargs)
+    return decorated_function
+
+
+
 @app.route('/')
 def home():
     if 'user_id' in session:
@@ -536,6 +547,7 @@ def dashboard():
     return render_template('dashboard.html')
 
 @app.route('/notes')
+@login_required
 def notes():
 
     try:
@@ -558,6 +570,7 @@ def notes():
     
 
 @app.route('/notes/add',methods=['GET','POST'])
+@login_required
 def add_note():
     if request.method=='POST':
         title = request.form.get('title')
@@ -588,6 +601,38 @@ def add_note():
 
 
     return render_template('add_note.html')
+
+@app.route('view-note/<int:note_id>')
+@login_required
+def view_note(note_id):
+
+    try :
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("SELECT * from notes where id = %s AND user_id=%s",(note_id,session.get('user_id')))
+
+        note = cursor.fetchone()
+        if not note:
+            flash('Note not found or access denied...!','error')
+            cursor.close()
+            conn.close()
+            return redirect(url_for('notes'))
+
+        cursor.execute('SELECT * from files where note_id=%s and user_id=%s',(note_id,session.get('user_id')))
+
+        attached_files = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        return render_template('view_note.html',note=note,attached_files=attached_files)
+    
+    except Error as err:
+        flash(f"Database Error:{err}",'error')
+        return redirect(url_for('notes'))
+    
+   
+
 
 
 if __name__ == '__main__':
