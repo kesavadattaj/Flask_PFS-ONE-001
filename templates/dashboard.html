@@ -13,12 +13,12 @@
             <div class="dashboard-stats">
                 <div class="stat-card">
                     <h3>📋</h3>
-                    <p class="stat-number">5</p>
+                    <p class="stat-number">{{notes_count}}</p>
                     <p>Total Notes</p>
                 </div>
                 <div class="stat-card">
                     <h3>📁</h3>
-                    <p class="stat-number">3</p>
+                    <p class="stat-number">{{files_count}}</p>
                     <p>Total Files</p>
                 </div>
             </div>
@@ -31,19 +31,27 @@
             
             <div class="notes-container">
                 <h2>Recent Notes</h2>
+                {% if notes %}
                 <div class="notes-grid">
+                    {% for note in notes %}
                     <div class="note-card">
-                        <h4>Sample Note 1</h4>
-                        <p>This is a sample note description that shows how notes will appear...</p>
-                        <p style="color: #667eea; font-size: 12px; margin: 5px 0;">📎 2 file(s) attached</p>
-                        <a href="view_note.html">View</a>
+                        <h4>{{note.title}}</h4>
+                        <p>{{note.description}}</p>
+                        <p style="color: #667eea; font-size: 12px; margin: 5px 0;">📎 {{note.files_count}} file(s) attached</p>
+                        <small style="color: #999;">Created: {{note.created_at}}</small>
+                        <div class="note-actions">
+                            <a href="{{url_for('view_note',note_id=note.id)}}" class="btn btn-secondary" style="padding: 8px 16px;">View</a>
+                            
+                        </div>
                     </div>
-                    <div class="note-card">
-                        <h4>Sample Note 2</h4>
-                        <p>Another sample note to demonstrate the layout...</p>
-                        <a href="view_note.html">View</a>
-                    </div>
+                    {% endfor %}
+                    
                 </div>
+                {% else %}
+                 <p style="text-align: center; color: #666; padding: 40px;">
+                No notes yet. <a href="{{ url_for('add_note') }}">Create your first note!</a>
+                </p>
+                {% endif %}
             </div>
         </div>
 

@@ -541,10 +541,32 @@ def reset_password(token):
 
 
 @app.route('/dashboard')
+@login_required
 def dashboard():
-    if not 'user_id' in session:
-        return redirect(url_for('login'))
-    return render_template('dashboard.html')
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        user_id = session.get('user_id')
+
+        cursor.execute("SELECT count(*) as notes_count from notes where user_id=%s",(user_id,))
+        notes_count = cursor.fetchone()['notes_count']
+
+        cursor.execute("SELECT count(*) as files_count from files where user_id=%s",(user_id,))
+        files_count = cursor.fetchone()['files_count']
+
+        cursor.execute("SELECT n.*,(SELECT count(*) from files f where f.note_id = n.id)  as files_count from notes n where user_id=%s ORDER BY n.created_at DESC LIMIT 3",(session.get('user_id'),))
+        
+        notes = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+    except Error as err:
+        flash(f"Database Error:{err}",'error')
+        return redirect(url_for('dashboard'))
+    
+    return render_template('dashboard.html',notes_count=notes_count,files_count=files_count,notes=notes)
 
 @app.route('/notes')
 @login_required
@@ -675,7 +697,28 @@ def edit_note(note_id):
         flash(f"Database Error:{err}",'error')
         return redirect(url_for('notes'))
 
+@app.route('/delete-note/<int:note_id>')
+@login_required
+def delete_note(note_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
 
+        cursor.execute("DELETE from notes where id=%s and user_id=%s",(note_id,session.get('user_id')))
+        conn.commit()
+
+        if cursor.rowcount > 0:
+            flash('Note Deleted Successfully...!','success')
+        else:
+            flash('Note not found or Access denied...!','error')
+
+        cursor.close()
+        conn.close()
+    except Error as err:
+        flash(f"Database Error:{err}",'error')
+        return redirect(url_for('notes'))
+    
+    return(redirect(url_for('notes')))    
 
 
 
