@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 import os
 import random
 from functools import wraps
+from werkzeug.utils import secure_filename
 load_dotenv()
 
 app = Flask(__name__)
@@ -194,6 +195,10 @@ def db_connection_required(f):
                 flash(f'Database error: {err}', 'error')
             return redirect(url_for('home'))
     return decorated_function
+
+def allowed_file(filename):
+    return '.' in filename and filename.split('.',1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+
 
 #Otp helper method
 def generate_otp():
@@ -719,6 +724,85 @@ def delete_note(note_id):
         return redirect(url_for('notes'))
     
     return(redirect(url_for('notes')))    
+
+@app.route('/files/upload',methods=["GET","POST"])
+@login_required
+def upload_file():
+    if request.method=='POST':
+        if 'file' not in request.files:
+            flash("No file is Selected....!",'error')
+            return redirect(request.url)
+
+        file = request.files['file']
+        note_id = request.form.get('note_id') or None
+        file_name = file.filename
+
+        if file_name=='':
+            flash('No file is selected..!','error')
+            return (request.url)
+
+        if file and allowed_file(file_name):
+            file_name = secure_filename(filename=file_name)
+
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'],file_name)
+            counter = 1
+            name,ext = os.path.splitext(file_name)
+            while os.path.exists(file_path):
+                file_name = f"{name}_{counter}{ext}"
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'],file_name)
+                counter+=1
+
+            file.save(file_path)
+
+            try:
+                conn = get_db_connection()
+                cursor = conn.cursor(dictionary=True)
+                cursor.execute("INSERT INTO files (user_id,note_id,filename,filepath) values (%s,%s,%s,%s)",(session.get('user_id'),note_id,file_name,file_path))
+
+                conn.commit()
+                cursor.close()
+                conn.close()
+
+                flash("File uploaded successfully",'success')
+                return redirect(url_for('files'))
+            except Error as err:
+                flash(f'Database error: {err}','error')  
+                return redirect(url_for('files'))
+        else:
+            flash("File type not allowed...!",'error')
+            return redirect(url_for('files'))
+    else:
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute("SELECT id,title from notes where user_id=%s",(session.get('user_id'),))
+            notes = cursor.fetchall()
+            cursor.close()
+            conn.close()
+        except Error as err:
+            notes = []
+            flash(f'Database error: {err}','error')
+        return render_template('upload_file.html',notes=notes)
+
+@app.route('/files')
+@login_required
+def files():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT f.*,n.title as note_tile from files f LEFT JOIN notes n on f.note_id=n.id where f.user_id=%s order by f.created_at DESC",(session.get("user_id"),))
+        files = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+    except Error as err:
+        files = []
+        flash(f'Database error: {err}','error')
+        
+
+    return render_template('files.html',files=files)
+
 
 
 
