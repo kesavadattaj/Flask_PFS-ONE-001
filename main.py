@@ -1,4 +1,4 @@
-from flask import Flask,request,redirect,url_for,render_template,flash,session
+from flask import Flask,request,redirect,url_for,render_template,flash,session,send_file
 from mysql.connector import connect,Error
 import bcrypt
 from datetime import datetime,timedelta
@@ -832,6 +832,29 @@ def delete_file(file_id):
     except Error as err:
         flash(f"Database Error: {err}")
         return redirect(url_for('files'))
+
+@app.route('/view-file/<int:file_id>')
+@login_required
+def view_file(file_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("SELECT * from files where id=%s and user_id=%s",(file_id,session.get('user_id')))
+
+        file = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if file and os.path.exists(file['filepath']):
+            return send_file(file['filepath'])
+
+        flash('file not found...!','error')
+    except Error as err:
+        flash(f"Database Error: {err}")
+        
+    return redirect(url_for('files'))
+    
 
 
 if __name__ == '__main__':

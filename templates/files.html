@@ -22,7 +22,7 @@
                         {% endif %}
                         <small style="color: #999;">Uploaded: {{file.created_at}}</small>
                         <div class="file-actions">
-                            <a href="#" class="btn btn-secondary" style="padding: 8px 12px; font-size: 14px;">View</a>
+                            <a href="{{url_for('view_file',file_id=file.id)}}" class="btn btn-secondary" style="padding: 8px 12px; font-size: 14px;">View</a>
                             <a href="#" class="btn btn-primary" style="padding: 8px 12px; font-size: 14px;">Download</a>
                             <a href="{{url_for('delete_file',file_id=file.id)}}" class="btn btn-danger" style="padding: 8px 12px; font-size: 14px;" onclick="return confirm('Are you sure?')">Delete</a>
                         </div>
