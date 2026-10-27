@@ -803,7 +803,35 @@ def files():
 
     return render_template('files.html',files=files)
 
+@app.route('/files/delete/<int:file_id>')
+@login_required
+def delete_file(file_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
 
+        cursor.execute("SELECT * from files where id=%s and user_id=%s",(file_id,session.get('user_id')))
+
+        file = cursor.fetchone()
+        if not file:
+            cursor.close()
+            conn.close()
+            flash('file not found or Access denied...!','error')
+            return redirect(url_for('files'))
+        else:
+            if os.path.exists(file['filepath']):
+                os.remove(file['filepath'])
+
+            cursor.execute("DELETE FROM files where id=%s",(file_id,))
+            conn.commit()
+            flash("File deleted successfully...!",'success')
+            cursor.close()
+            conn.close()
+            return redirect(url_for('files'))
+        
+    except Error as err:
+        flash(f"Database Error: {err}")
+        return redirect(url_for('files'))
 
 
 if __name__ == '__main__':
