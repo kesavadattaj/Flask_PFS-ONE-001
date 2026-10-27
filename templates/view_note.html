@@ -20,9 +20,9 @@
                     <div style="display: flex; flex-wrap: wrap; gap: 10px;">
                         {% for file in attached_files %}
                         <div style="background: #e9ecef; padding: 10px 15px; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
-                            <span>📄 {file.filename}</span>
-                            <a href="files.html" style="color: #667eea;">View</a>
-                            <a href="#" style="color: #28a745;">Download</a>
+                            <span>📄 {{file.filename}}</span>
+                            <a href="{{url_for('view_file',file_id=file.id)}}" style="color: #667eea;">View</a>
+                            <a href="{{url_for('download_file',file_id=file.id)}}" style="color: #28a745;">Download</a>
                         </div>
                         {% endfor %}
                     </div>

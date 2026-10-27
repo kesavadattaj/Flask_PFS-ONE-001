@@ -790,9 +790,9 @@ def files():
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT f.*,n.title as note_tile from files f LEFT JOIN notes n on f.note_id=n.id where f.user_id=%s order by f.created_at DESC",(session.get("user_id"),))
+        cursor.execute("SELECT f.*,n.title as note_title from files f LEFT JOIN notes n on f.note_id=n.id where f.user_id=%s order by f.created_at DESC",(session.get("user_id"),))
         files = cursor.fetchall()
-
+        print(files)
         cursor.close()
         conn.close()
 
@@ -852,9 +852,32 @@ def view_file(file_id):
         flash('file not found...!','error')
     except Error as err:
         flash(f"Database Error: {err}")
-        
+
     return redirect(url_for('files'))
-    
+
+
+
+@app.route('/download-file/<int:file_id>')
+@login_required
+def download_file(file_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("SELECT * from files where id=%s and user_id=%s",(file_id,session.get('user_id')))
+
+        file = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if file and os.path.exists(file['filepath']):
+            return send_file(file['filepath'],as_attachment=True,download_name=file['filename'])
+
+        flash('file not found...!','error')
+    except Error as err:
+        flash(f"Database Error: {err}")
+
+    return redirect(url_for('files'))
 
 
 if __name__ == '__main__':
