@@ -10,6 +10,7 @@ import os
 import random
 from functools import wraps
 from werkzeug.utils import secure_filename
+import re
 load_dotenv()
 
 app = Flask(__name__)
@@ -878,6 +879,37 @@ def download_file(file_id):
         flash(f"Database Error: {err}")
 
     return redirect(url_for('files'))
+
+
+@app.route('/search',methods = ['GET','POST'])
+@login_required
+def search():
+
+    results = None
+    query = None
+
+    if request.method=='POST':
+        query = request.form.get('query')
+
+        if not re.match(r'^[\w\s]+$',query):
+            flash('Invalid search query...! Use only Letters, Numbers, and Spaces.','error')
+            return redirect(url_for('search'))
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor(dictionary=True)
+
+            search_pattern = f"%{query}%"
+            
+            cursor.execute("SELECT * from notes where user_id=%s AND (title LIKE %s or description LIKE %s) order by created_at DESC",(session.get('user_id'),search_pattern,search_pattern))
+            results = cursor.fetchall()
+
+            cursor.close()
+            conn.close()
+
+        except Error as err:
+            results = []
+            flash(f"Database Error:{err}")
+    return render_template('search.html',results=results,query=query)
 
 
 if __name__ == '__main__':
